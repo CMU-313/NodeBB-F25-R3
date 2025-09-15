@@ -135,7 +135,7 @@ define('forum/register', [
                     showSuccess(username_notify, successIcon);
                     clearUsernameSuggestion(); // ensure hint gone when valid
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    showError(username_notify, '[[error:username-taken, "$(username)suffix"]]');
                     // show "<desired>suffix" suggestion (English-only)
                     showUsernameSuggestion(username);
                 }
