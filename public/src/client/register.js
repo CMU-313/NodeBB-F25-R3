@@ -131,7 +131,8 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const suggestion = utils.generateUsernameSuggestion(username);
+                    showError(username_notify, '[[error:username-taken-suggestion, ' + suggestion + ']]');
                 }
 
                 callback();
