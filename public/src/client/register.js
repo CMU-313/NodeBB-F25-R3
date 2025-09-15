@@ -111,6 +111,51 @@ define('forum/register', [
         $('#username').focus();
     };
 
+    async function suggestAltUsernameClient(baseUsername) {
+        const suffix = (config.usernameSuggestionSuffix || '-nbb'); // default suffix, can be set via ACP/config
+        const minLen = ajaxify.data.minimumUsernameLength;
+        const maxLen = ajaxify.data.maximumUsernameLength;
+
+        // base candidate = username + suffix
+        const base = (baseUsername + suffix).slice(0, maxLen);
+
+        async function isFree(name) {
+            const results = await Promise.allSettled([
+                api.head(`/users/bySlug/${name}`, {}),
+                api.head(`/groups/${name}`, {}),
+            ]);
+            return results.every(r => r.status === 'rejected'); // free only if both 404
+        }
+
+        // 1) plain with suffix
+        if (base.length >= minLen && await isFree(base)) {
+            return base;
+        }
+
+        // 2) try numeric suffixes: foo-nbb1, foo-nbb2, ...
+        for (let i = 1; i <= 50; i += 1) {
+            const room = maxLen - String(i).length;
+            const trial = (baseUsername + suffix).slice(0, room) + String(i);
+            // eslint-disable-next-line no-await-in-loop
+            if (trial.length >= minLen && await isFree(trial)) {
+                return trial;
+            }
+        }
+
+        // 3) fallback random: foo-nbbXYZ
+        for (let t = 0; t < 50; t += 1) {
+            const n = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            const trial = (baseUsername + suffix).slice(0, maxLen - 3) + n;
+            // eslint-disable-next-line no-await-in-loop
+            if (trial.length >= minLen && await isFree(trial)) {
+                return trial;
+            }
+        }
+
+        return base; // give back something
+    }
+
+
     function validateUsername(username, callback) {
         callback = callback || function () {};
 
@@ -131,7 +176,11 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    (async () => {
+                        const suggestion = await suggestAltUsernameClient(username);
+                        // You can add an i18n key later; for now a friendly literal is fine:
+                        showError(username_notify, `That username is taken. Try <b>${utils.escapeHTML(suggestion)}</b>.`);
+                    })();
                 }
 
                 callback();
