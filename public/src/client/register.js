@@ -131,11 +131,26 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const randomSuffix = Math.floor(Math.random() * 9000);
+                    const newUsername = `${username}${randomSuffix}`;
+                    showError(username_notify, `[[error:username-taken, ${newUsername}]]`);
                 }
 
                 callback();
             });
+        }
+    }
+
+    function suggestUsername(username) {
+        let numTries = 0;
+        while (true) {
+            /* eslint-disable no-await-in-loop */
+            const exists = meta.userOrGroupExists(username);
+            if (!exists) {
+                return numTries ? username : null;
+            }
+            username = `${username} ${numTries.toString(32)}`;
+            numTries += 1;
         }
     }
 
