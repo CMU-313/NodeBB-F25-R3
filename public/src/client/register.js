@@ -113,7 +113,6 @@ define('forum/register', [
 
     function validateUsername(username, callback) {
         callback = callback || function () {};
-
         const username_notify = $('#username-notify');
         const userslug = slugify(username);
         if (username.length < ajaxify.data.minimumUsernameLength ||
@@ -129,14 +128,34 @@ define('forum/register', [
                 api.head(`/groups/${username}`, {}),
             ]).then((results) => {
                 if (results.every(obj => obj.status === 'rejected')) {
+                    // The original username is available.
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    // The original username is taken. Generate and check a suggestion.
+                    const suggestedSuffix = generateSuffix();
+                    const suggestedUsername = username + suggestedSuffix;
+                    Promise.allSettled([
+                        api.head(`/users/bySlug/${suggestedUsername}`, {}),
+                        api.head(`/groups/${suggestedUsername}`, {}),
+                    ]).then((suggestedResults) => {
+                        if (suggestedResults.every(obj => obj.status === 'rejected')) {
+                            // The suggested username is available.
+                            showError(username_notify, `Username taken. Maybe try "${suggestedUsername}"`);
+                        } else {
+                            // The suggested username is also taken, or the API call failed.
+                            showError(username_notify, '[[error:username-taken]]');
+                        }
+                        callback();
+                    });
+                    return;
                 }
-
                 callback();
             });
         }
+    }
+
+    function generateSuffix() {
+        return Math.floor(1000 + (Math.random() * 9000));
     }
 
     function validatePassword(password, password_confirm) {
