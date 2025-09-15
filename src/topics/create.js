@@ -266,6 +266,27 @@ module.exports = function (Topics) {
         }
     }
 
+    // CHATGPT ASSISTED FUNCTION
+    async function suggestAvailableUsername(userslug) {
+        let attempt = 0;
+        const maxAttempts = 20;
+        while (attempt < maxAttempts) {
+            const suffix = attempt === 0 ? '' : _.random(1, 999);
+            const username = `${userslug}${suffix}`;
+            try {
+                await User.checkUsername(username);
+                return username;
+            } catch (err) {
+                if (err.message.includes('[[error:username-taken]]')) {
+                    attempt += 1;
+                    continue;
+                }
+                throw err;
+            }
+        }
+        throw new Error('Could not find an available username after multiple attempts.');
+    }
+
     async function guestHandleValid(data) {
         if (meta.config.allowGuestHandles && parseInt(data.uid, 10) === 0 && data.handle) {
             if (data.handle.length > meta.config.maximumUsernameLength) {
@@ -273,7 +294,8 @@ module.exports = function (Topics) {
             }
             const exists = await user.existsBySlug(slugify(data.handle));
             if (exists) {
-                throw new Error('[[error:username-taken]]');
+                const suggestion = await suggestAvailableUsername(user.slugify(data.handle));
+                throw new Error(`[[error:username-taken]] Suggested username: ${suggestion}`);
             }
         }
     }

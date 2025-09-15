@@ -111,6 +111,27 @@ define('forum/register', [
         $('#username').focus();
     };
 
+    // CHATGPT ASSISTED FUNCTION
+    async function suggestAvailableUsername(userslug) {
+        let attempt = 0;
+        const maxAttempts = 20;
+        while (attempt < maxAttempts) {
+            const suffix = attempt === 0 ? '' : _.random(1, 999);
+            const username = `${userslug}${suffix}`;
+            try {
+                await User.checkUsername(username);
+                return username;
+            } catch (err) {
+                if (err.message.includes('[[error:username-taken]]')) {
+                    attempt += 1;
+                    continue;
+                }
+                throw err;
+            }
+        }
+        throw new Error('Could not find an available username after multiple attempts.');
+    }
+
     function validateUsername(username, callback) {
         callback = callback || function () {};
 
@@ -131,7 +152,8 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const suggestion = await suggestAvailableUsername(userslug);
+                    showError(username_notify, `[[error:username-taken]] Suggested username: ${suggestion}`);
                 }
 
                 callback();
