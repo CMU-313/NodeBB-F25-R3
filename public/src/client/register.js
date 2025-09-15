@@ -131,7 +131,7 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    const newName = username + Math.floor(Math.random() * 1000);
+                    const newName = username + Math.floor(Math.random() * 10000);
                     showError(username_notify, '[[error:username-taken, ' + newName + ']]');
                 }
                 callback();
