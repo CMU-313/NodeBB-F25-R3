@@ -127,7 +127,15 @@ module.exports = function (User) {
         }
         const exists = await User.existsBySlug(userslug);
         if (exists) {
-            throw new Error('[[error:username-taken]]');
+            const suffix = '123';
+            let newUsername = `${data.username}${suffix}`;
+            let newUserSlug = slugify(newUsername);
+            // eslint-disable-next-line no-await-in-loop
+            while (await User.existsBySlug(newUserSlug)) {
+                newUsername = `${newUsername}${suffix}`;
+                newUserSlug = slugify(newUsername);
+            }
+            throw new Error(`[[error:username-taken, ${newUsername}]]`);
         }
 
         const { error } = await plugins.hooks.fire('filter:username.check', {

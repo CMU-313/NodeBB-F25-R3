@@ -131,7 +131,9 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const suffix = '123';
+                    const newUsername = `${username}${suffix}`;
+                    showError(username_notify, `[[error:username-taken, ${newUsername}]]`);
                 }
 
                 callback();
