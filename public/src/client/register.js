@@ -131,7 +131,7 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    // found file
+                    // found file recitation 3
                     showError(username_notify, '[[error:username-taken]]');
                 }
 
