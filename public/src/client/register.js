@@ -131,7 +131,8 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    console.log('USERNAME TAKEN!!!!');
+                    showError(username_notify, '[[error:username-taken]]', username);
                 }
 
                 callback();
@@ -175,9 +176,9 @@ define('forum/register', [
         }
     }
 
-    function showError(element, msg) {
+    function showError(element, msg, username) {
         translator.translate(msg, function (msg) {
-            element.html(msg);
+            element.html(msg + '. Maybe try "' + username + 'suffix"');
             element.parent()
                 .removeClass('register-success')
                 .addClass('register-danger');
