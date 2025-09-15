@@ -127,7 +127,9 @@ module.exports = function (User) {
         }
         const exists = await User.existsBySlug(userslug);
         if (exists) {
-            throw new Error('[[error:username-taken]]');
+            const suffix = 'suffix';
+            const suggestion = `${data.username}${suffix}`;
+            throw new Error(`[[error:username-taken, ${suggestion}]]`);
         }
 
         const { error } = await plugins.hooks.fire('filter:username.check', {
