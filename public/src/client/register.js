@@ -131,12 +131,36 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    // Instead of only showing error, suggest an alternative
+                    generateSuggestion(username).then(suggestion => {
+                        if (suggestion) {
+                            showError(username_notify,
+                                `[[error:username-taken]] — try <strong>${suggestion}</strong>`);
+                        } else {
+                            showError(username_notify, `[[error:username-taken]] — try <strong>${username}suffix</strong>`);
+                        }
+                        callback();
+                    });
+                    return;
                 }
 
                 callback();
             });
         }
+    }
+
+    // Suggest an available alternative username by appending a fixed suffix
+    function generateSuggestion(base) {
+        const candidate = `${base}suffix`;
+        return Promise.allSettled([
+            api.head(`/users/bySlug/${candidate}`, {}),
+            api.head(`/groups/${candidate}`, {}),
+        ]).then((results) => {
+            if (results.every(obj => obj.status === 'rejected')) {
+                return candidate;
+            }
+            return null;
+        });
     }
 
     function validatePassword(password, password_confirm) {
