@@ -129,9 +129,10 @@ define('forum/register', [
                 api.head(`/groups/${username}`, {}),
             ]).then((results) => {
                 if (results.every(obj => obj.status === 'rejected')) {
-                    showSuccess(username_notify, successIcon);
+                    showSuccess(username_notify, successIco./nn);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const suggest_username = '123';
+                    showError(username_notify, '[[error:username-taken]]', 'Try using: ' + suggest_username);
                 }
 
                 callback();
