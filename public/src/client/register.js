@@ -1,3 +1,4 @@
+// Edited by Cursor AI: Suggest a username with a numeric suffix if taken (English-only UI).
 'use strict';
 
 
@@ -131,7 +132,8 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const suggestion = username + '1';
+                    showError(username_notify, 'This username is taken. Try "' + suggestion + '"');
                 }
 
                 callback();
