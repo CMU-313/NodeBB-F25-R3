@@ -132,11 +132,54 @@ define('forum/register', [
                     showSuccess(username_notify, successIcon);
                 } else {
                     showError(username_notify, '[[error:username-taken]]');
+                    const suggestion = buildUsernameSuggestion(username);
+                    showUsernameSuggestionUI(suggestion);
                 }
 
                 callback();
             });
         }
+    }
+
+    function buildUsernameSuggestion(requested) {
+        const trimmed = (requested || '').trim();
+        if (!trimmed) return '';
+
+        // If it already ends with digits, increment them; else append "1"
+        const m = trimmed.match(/^(.*?)(\d+)$/);
+        if (m) {
+            const base = m[1];
+            const n = String(parseInt(m[2], 10) + 1);
+            return base + n;
+        }
+        return trimmed + '123';
+    }
+
+    function showUsernameSuggestionUI(suggested) {
+        console.log('nice');
+        const $input = $('#username'); // adjust if your input uses a different id/name
+        if (!$input.length || !suggested) return;
+
+        // Remove any previous hint
+        $('#username-suggestion-hint').remove();
+
+        const $hint = $(`
+            <div id="username-suggestion-hint" class="text-muted" style="margin-top:6px;">
+            That username is taken. Try
+            <button type="button" id="apply-username-suggestion"
+                    class="btn btn-link p-0 align-baseline"
+                    aria-label="Use suggested username">${suggested}</button>?
+            </div>
+        `);
+
+        $hint.insertAfter($input);
+
+        // Fill the input with the suggestion when clicked and focus the field
+        $('#apply-username-suggestion').on('click', function () {
+            $input.val(suggested).trigger('input').focus();
+            // Optional: remove hint after applying
+            $('#username-suggestion-hint').remove();
+        });
     }
 
     function validatePassword(password, password_confirm) {
