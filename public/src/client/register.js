@@ -112,7 +112,7 @@ define('forum/register', [
     };
 
     function validateUsername(username, callback) {
-        callback = callback || function () {};
+        callback = callback || function () { };
 
         const username_notify = $('#username-notify');
         const userslug = slugify(username);
@@ -131,7 +131,7 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    showError(username_notify, `[[error:username-taken, ${username + 'suffix'}]]`);
                 }
 
                 callback();
