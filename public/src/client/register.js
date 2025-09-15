@@ -111,6 +111,7 @@ define('forum/register', [
         $('#username').focus();
     };
 
+    // error lies within this function
     function validateUsername(username, callback) {
         callback = callback || function () {};
 
@@ -131,7 +132,11 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    // this is the case where the already username is taken
+                    // I added a new suffix and add it into the username
+                    const suffix = '1234';
+                    showError(username_notify, `[[error:username-taken, ${username}${suffix}]]`);
+                    // showError(username_notify, `Username taken. Try ${username}${suffix}]]`);
                 }
 
                 callback();
