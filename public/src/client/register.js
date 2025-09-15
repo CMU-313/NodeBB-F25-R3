@@ -132,6 +132,7 @@ define('forum/register', [
                     showSuccess(username_notify, successIcon);
                 } else {
                     showError(username_notify, '[[error:username-taken]]');
+                    console.log('username_taken_test');
                 }
 
                 callback();
