@@ -135,7 +135,7 @@ define('forum/register', [
                     showSuccess(username_notify, successIcon);
                 } else {
                     const suggested = suggestUsername(username);
-                    showError(username_notify, '[[error:username-suggested::${suggested}]]');
+                    showError(username_notify, '[[error:username-suggested]]', suggested);
                 }
                 callback();
             });
@@ -178,9 +178,12 @@ define('forum/register', [
         }
     }
 
-    function showError(element, msg) {
-        translator.translate(msg, function (msg) {
-            element.html(msg);
+    function showError(element, msg, value) {
+        translator.translate(msg, config.defaultLang, function (translated) {
+            if (value !== undefined) {
+                translated = translated.replace('%1', value);
+            }
+            element.html(translated);
             element.parent()
                 .removeClass('register-success')
                 .addClass('register-danger');

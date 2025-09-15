@@ -35,7 +35,7 @@
 	"folder-exists": "Folder exists",
 
 	"invalid-pagination-value": "Invalid pagination value, must be at least %1 and at most %2",
-	"username-suggested": "Username taken. Try %1",
+	"username-suggested": "Username taken. Try \"%1\"",
 	"username-taken": "Username taken",
 	"email-taken": "Email taken",
 	"email-nochange": "The email entered is the same as the email already on file.",
