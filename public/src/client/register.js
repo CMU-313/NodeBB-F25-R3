@@ -131,8 +131,8 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    const suggestion = utils.generateUsernameSuggestion(username);
-                    showError(username_notify, '[[error:username-taken-suggestion, ' + suggestion + ']]');
+                    const suggestion = `${userslug}suffix`;   // sanitized slug + suffix
+                    showError(username_notify, `[[error:username-taken]] Maybe try "${suggestion}".`);
                 }
 
                 callback();
