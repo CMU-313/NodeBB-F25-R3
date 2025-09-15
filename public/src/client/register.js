@@ -111,6 +111,10 @@ define('forum/register', [
         $('#username').focus();
     };
 
+    function makeUsernameUnique(username) {
+        return username + Math.random().toString().split('.')[1];
+    }
+
     function validateUsername(username, callback) {
         callback = callback || function () {};
 
@@ -131,7 +135,11 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const username_unique = makeUsernameUnique(username);
+                    showError(
+                        username_notify,
+                        `[[error:username-taken]]. Maybe try ${username_unique}.`
+                    );
                 }
 
                 callback();
