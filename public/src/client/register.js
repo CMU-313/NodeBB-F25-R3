@@ -114,6 +114,9 @@ define('forum/register', [
     function validateUsername(username, callback) {
         callback = callback || function () {};
 
+        // always clear any previous hint first
+        clearUsernameSuggestion();
+
         const username_notify = $('#username-notify');
         const userslug = slugify(username);
         if (username.length < ajaxify.data.minimumUsernameLength ||
@@ -130,8 +133,11 @@ define('forum/register', [
             ]).then((results) => {
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
+                    clearUsernameSuggestion(); // ensure hint gone when valid
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    showError(username_notify, '[[error:username-taken, "$(username)suffix"]]');
+                    // show "<desired>suffix" suggestion (English-only)
+                    showUsernameSuggestion(username);
                 }
 
                 callback();
@@ -204,6 +210,47 @@ define('forum/register', [
             formEl.append(langEl);
         }
     }
+
+        // --- Suggestion helpers (English-only UI) -- ChatGPT ---
+    function showUsernameSuggestion(base) {
+        const input = document.getElementById('username') || document.querySelector('input[name="username"]');
+        if (!input) { return; }
+
+        const suggestion = (base || '').trim() + 'suffix';  // per spec: literal "suffix"
+
+        // create or reuse a hint row under the username input
+        let hint = document.getElementById('username-suggestion');
+        if (!hint) {
+            hint = document.createElement('div');
+            hint.id = 'username-suggestion';
+            hint.className = 'text-muted';
+            hint.style.marginTop = '0.25rem';
+            input.insertAdjacentElement('afterend', hint);
+        }
+
+        // button keeps keyboard accessibility (focusable/clickable)
+        hint.innerHTML = 'Username is taken. Try ' +
+            '<button type="button" id="use-suggested" class="btn btn-link btn-sm p-0 align-baseline">' +
+            utils.escapeHTML(suggestion) +
+            '</button>?';
+
+        const btn = document.getElementById('use-suggested');
+        if (btn) {
+            btn.onclick = function () {
+                input.value = suggestion;
+                // trigger existing keyup logic to update #yourUsername preview
+                input.dispatchEvent(new Event('keyup', { bubbles: true }));
+                input.focus();
+                hint.textContent = 'Using suggested username.';
+            };
+        }
+    }
+
+    function clearUsernameSuggestion() {
+        const hint = document.getElementById('username-suggestion');
+        if (hint) { hint.remove(); }
+    }
+
 
     return Register;
 });
