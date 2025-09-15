@@ -4,6 +4,20 @@ define('forum/account/edit/username', [
     'forum/account/header', 'api', 'slugify', 'alerts',
 ], function (header, api, slugify, alerts) {
     const AccountEditUsername = {};
+    function suggestUsername(base) {
+        // 4-digit number: 1000..9999
+        const rand = Math.floor(100 + (Math.random() * 900));
+        const withSuffix = `${base}${rand}`;
+        return slugify(withSuffix).replace(/-/g, '');
+    }
+
+    // Detect “username taken” coming back from API
+    function isUsernameTakenError(err) {
+        const msg = (err && (err.message || err)) || '';
+        console.log('issue');
+        return typeof msg === 'string' &&
+            (msg.includes('username-taken') || /Username taken/i.test(msg));
+    }
 
     AccountEditUsername.init = function () {
         header.init();
@@ -38,10 +52,18 @@ define('forum/account/edit/username', [
                 }
 
                 ajaxify.go('user/' + userslug + '/edit');
-            }).catch(alerts.error)
-                .finally(() => {
-                    btn.removeClass('disabled').find('i').addClass('hide');
-                });
+            }).catch((err) => {
+                console.log('API error payload:', err);
+                if (isUsernameTakenError(err)) {
+                    const base = $('#inputNewUsername').val().trim();
+                    const suggestion = suggestUsername(base);
+                    $('#inputNewUsername').val(suggestion).focus().select();
+                    alerts.alert('[[user:username_suggestion, ' + suggestion + ']]');
+                    return;
+                } return alerts.error(err);
+            }).finally(() => {
+                btn.removeClass('disabled').find('i').addClass('hide');
+            });
 
             return false;
         });
