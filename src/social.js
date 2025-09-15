@@ -14,7 +14,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setActivePostSharingNetworks = exports.getActivePostSharing = exports.getPostSharing = void 0;
+exports.getPostSharing = getPostSharing;
+exports.getActivePostSharing = getActivePostSharing;
+exports.setActivePostSharingNetworks = setActivePostSharingNetworks;
 const lodash_1 = __importDefault(require("lodash"));
 const plugins_1 = __importDefault(require("./plugins"));
 const database_1 = __importDefault(require("./database"));
@@ -49,14 +51,12 @@ function getPostSharing() {
         return lodash_1.default.cloneDeep(networks);
     });
 }
-exports.getPostSharing = getPostSharing;
 function getActivePostSharing() {
     return __awaiter(this, void 0, void 0, function* () {
         const networks = yield getPostSharing();
         return networks.filter(network => network && network.activated);
     });
 }
-exports.getActivePostSharing = getActivePostSharing;
 function setActivePostSharingNetworks(networkIDs) {
     return __awaiter(this, void 0, void 0, function* () {
         postSharing = null;
@@ -71,4 +71,3 @@ function setActivePostSharingNetworks(networkIDs) {
         yield database_1.default.setAdd('social:posts.activated', networkIDs);
     });
 }
-exports.setActivePostSharingNetworks = setActivePostSharingNetworks;

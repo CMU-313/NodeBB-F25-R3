@@ -14,7 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.post = exports.get = void 0;
+exports.get = get;
+exports.post = post;
 const nconf_1 = __importDefault(require("nconf"));
 const user_1 = __importDefault(require("../user"));
 const plugins_1 = __importDefault(require("../plugins"));
@@ -47,7 +48,7 @@ function get(req, res, callback) {
         }
     });
 }
-exports.get = get;
+
 function post(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         const { body } = req;
@@ -109,4 +110,4 @@ function post(req, res) {
         }
     });
 }
-exports.post = post;
+
