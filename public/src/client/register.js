@@ -1,5 +1,8 @@
 'use strict';
 
+function suggestUsername(originalName) {
+    return originalName + "1";
+}
 
 define('forum/register', [
     'translator', 'slugify', 'api', 'bootbox', 'forum/login', 'zxcvbn', 'jquery-form',
@@ -131,9 +134,9 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const suggested = suggestUsername(username);
+                    showError(username_notify, '[[error:username-suggested]]', suggested);
                 }
-
                 callback();
             });
         }
@@ -175,9 +178,12 @@ define('forum/register', [
         }
     }
 
-    function showError(element, msg) {
-        translator.translate(msg, function (msg) {
-            element.html(msg);
+    function showError(element, msg, value) {
+        translator.translate(msg, config.defaultLang, function (translated) {
+            if (value !== undefined) {
+                translated = translated.replace('%1', value);
+            }
+            element.html(translated);
             element.parent()
                 .removeClass('register-success')
                 .addClass('register-danger');
