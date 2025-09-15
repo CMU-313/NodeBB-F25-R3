@@ -115,6 +115,8 @@ define('forum/register', [
         callback = callback || function () {};
 
         const username_notify = $('#username-notify');
+        username_notify.text('');
+        
         const userslug = slugify(username);
         if (username.length < ajaxify.data.minimumUsernameLength ||
             userslug.length < ajaxify.data.minimumUsernameLength) {
@@ -131,7 +133,7 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(usernameInput, username_notify, '[[error:username-taken]]' + ' maybe try ' + $('#username').val() + 'suffix instead');
+                    showError(username_notify, '[[error:username-taken]]' + ' maybe try ' + $('#username').val() + 'suffix instead');
                 }
 
                 callback();
