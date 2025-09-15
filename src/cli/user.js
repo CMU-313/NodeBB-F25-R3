@@ -182,7 +182,16 @@ function UserCommands() {
 
         const userExists = await user.getUidByUsername(username);
         if (userExists) {
-            return winston.error(`[userCmd/create] A user with username '${username}' already exists`);
+            let suggestion = `${username}suffix`;
+            const suggestionExists = await user.getUidByUsername(suggestion);
+            if (suggestionExists) {
+                suggestion = username + Math.floor(Math.random() * 1000);
+            }
+
+            const message = `A user with username '${username}' already exists. Maybe try '${suggestion}'`;
+
+            winston.error(`[userCmd/create] ${message}`);
+            throw new Error(message);
         }
 
         const uid = await user.create({
@@ -247,18 +256,18 @@ ${pwGenerated ? ` Generated password: ${password}` : ''}`);
         const adminUid = await getAdminUidOrFail();
 
         switch (type) {
-        case 'purge':
-            await Promise.all(uids.map(uid => user.delete(adminUid, uid)));
-            winston.info(`[userCmd/delete] User(s) with their content has been deleted.`);
-            break;
-        case 'account':
-            await Promise.all(uids.map(uid => user.deleteAccount(uid)));
-            winston.info(`[userCmd/delete] User(s) has been deleted, their content left intact.`);
-            break;
-        case 'content':
-            await Promise.all(uids.map(uid => user.deleteContent(adminUid, uid)));
-            winston.info(`[userCmd/delete] User(s)' content has been deleted.`);
-            break;
+            case 'purge':
+                await Promise.all(uids.map(uid => user.delete(adminUid, uid)));
+                winston.info(`[userCmd/delete] User(s) with their content has been deleted.`);
+                break;
+            case 'account':
+                await Promise.all(uids.map(uid => user.deleteAccount(uid)));
+                winston.info(`[userCmd/delete] User(s) has been deleted, their content left intact.`);
+                break;
+            case 'content':
+                await Promise.all(uids.map(uid => user.deleteContent(adminUid, uid)));
+                winston.info(`[userCmd/delete] User(s)' content has been deleted.`);
+                break;
         }
     }
 
