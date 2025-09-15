@@ -132,7 +132,7 @@ define('forum/register', [
                     showSuccess(username_notify, successIcon);
                 } else {
                     const suggestion = `${userslug}suffix`;   // sanitized slug + suffix
-                    showError(username_notify, `[[error:username-taken]] Maybe try "${suggestion}".`);
+                    showError(username_notify, `[[error:username-taken]] maybe try "${suggestion}".`);
                 }
 
                 callback();
