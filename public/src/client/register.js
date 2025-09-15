@@ -1,5 +1,8 @@
 'use strict';
 
+function suggestUsername(originalName) {
+    return originalName + "1";
+}
 
 define('forum/register', [
     'translator', 'slugify', 'api', 'bootbox', 'forum/login', 'zxcvbn', 'jquery-form',
@@ -131,9 +134,9 @@ define('forum/register', [
                 if (results.every(obj => obj.status === 'rejected')) {
                     showSuccess(username_notify, successIcon);
                 } else {
-                    showError(username_notify, '[[error:username-taken]]');
+                    const suggested = suggestUsername(username);
+                    showError(username_notify, '[[error:username-suggested::${suggested}]]');
                 }
-
                 callback();
             });
         }
