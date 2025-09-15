@@ -141,19 +141,6 @@ define('forum/register', [
         }
     }
 
-    function suggestUsername(username) {
-        let numTries = 0;
-        while (true) {
-            /* eslint-disable no-await-in-loop */
-            const exists = meta.userOrGroupExists(username);
-            if (!exists) {
-                return numTries ? username : null;
-            }
-            username = `${username} ${numTries.toString(32)}`;
-            numTries += 1;
-        }
-    }
-
     function validatePassword(password, password_confirm) {
         const password_notify = $('#password-notify');
         const password_confirm_notify = $('#password-confirm-notify');
